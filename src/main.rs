@@ -2,6 +2,20 @@ use std::io;
 use std::fs;
 
 fn main() {
+
+    // Initialize document folder
+    let document_path = "/documents";
+
+    match fs::exists(document_path) {
+        Ok(b) => println!("{}", b),
+        Err(_) => {
+            fs::create_dir(document_path)
+                        .expect("Failed to initialize directory")
+        },
+
+    }
+
+
     // Works exactly as 'while True'
     loop {
         print!("\n\n\nWelcome to the command line text editor!\n\n");
@@ -79,7 +93,7 @@ fn edit_document() {
     println!("Enter the name of the document to edit:");
     let filename = readline();
 
-    let contents = fs::read_to_string(filename.clone())
+    let _contents = fs::read_to_string(filename.clone())
         .expect("Something went wrong reading the file");
 
     println!("Enter the new contents of the document:");
