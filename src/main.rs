@@ -1,19 +1,17 @@
 use std::io;
 use std::fs;
+use whoami;
+
+fn get_document_path() -> String {
+    return format!("C:/Users/{}/Documents/CLI_Notes_App", whoami::username());
+}
 
 fn main() {
 
     // Initialize document folder
-    let document_path = "/documents";
-
-    match fs::exists(document_path) {
-        Ok(b) => println!("{}", b),
-        Err(_) => {
-            fs::create_dir(document_path)
-                        .expect("Failed to initialize directory")
-        },
-
-    }
+    let document_path = get_document_path();
+    fs::create_dir_all(document_path.clone())
+        .expect("Failed to create document folder");
 
 
     // Works exactly as 'while True'
@@ -51,15 +49,20 @@ fn readline() -> String {
 }
 
 fn create_document() {
+    // Ask for filename
     println!("Enter the name of the new document:");
     let filename = readline();
 
+    // Ask for contents
     println!("Enter the contents of the new document:");
     let contents = readline();
 
-    fs::write(filename.clone(), contents.clone())
+    // Write to file
+    let path = format!("{}/{}.txt", get_document_path(), filename);
+    fs::write(path, contents.clone())
         .expect("Something went wrong writing the file");
 
+    // Print success message
     println!("Created {} with contents:\n{}", filename, contents);
     readline();
 }
@@ -76,7 +79,7 @@ fn open_document() {
 }
 
 fn list_documents() {
-    let paths = fs::read_dir(".")
+    let paths = fs::read_dir(get_document_path())
         .expect("Failed to read directory");
 
     println!("Documents in current directory:");
@@ -84,7 +87,7 @@ fn list_documents() {
         let path = path
             .expect("Failed to get path")
             .path();
-        println!("{}", path.display());
+        println!("{}", path.file_name().unwrap().to_str().unwrap());
     }
     readline();
 }
