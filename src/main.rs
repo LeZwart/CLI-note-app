@@ -71,10 +71,16 @@ fn open_document() {
     println!("Enter the name of the document to open:");
     let filename = readline();
 
-    let contents = fs::read_to_string(filename.clone())
-        .expect("Something went wrong reading the file");
-
-    println!("Opened {} with contents:\n{}", filename, contents);
+    match fs::read_to_string(format!("{}/{}.txt", get_document_path(), filename)) {
+        Ok(contents) => {
+            println!("\nContents of {}:", filename);
+            println!("{}", contents);
+        },
+        Err(_) => {
+            println!("{} does not exist!", filename);
+        }
+        
+    }
     readline();
 }
 
@@ -82,31 +88,47 @@ fn list_documents() {
     let paths = fs::read_dir(get_document_path())
         .expect("Failed to read directory");
 
-    println!("Documents in current directory:");
+    println!("Saved Documents:");
     for path in paths {
         let path = path
             .expect("Failed to get path")
             .path();
-        println!("{}", path.file_name().unwrap().to_str().unwrap());
+
+        // Only print .txt files
+        if path.extension().unwrap() == "txt" {
+            println!("{}", path.file_stem().unwrap().to_str().unwrap());
+        }
     }
     readline();
 }
 
+// TODO: Make more user friendly
 fn edit_document() {
     println!("Enter the name of the document to edit:");
     let filename = readline();
 
-    let _contents = fs::read_to_string(filename.clone())
-        .expect("Something went wrong reading the file");
+    // Check if file exists
+    match fs::read_to_string(format!("{}/{}.txt", get_document_path(), filename)) {
 
-    println!("Enter the new contents of the document:");
-    let new_contents = readline();
+        // If file exists, read contents, print them, ask for new content, write to file
+        Ok(mut contents) => {
+            println!("Contents of {}:", filename);
+            println!("{}", contents);
 
-    fs::write(filename.clone(), new_contents.clone())
-        .expect("Something went wrong writing the file");
+            println!("Enter new contents:");
+            let new_contents = readline();
+            contents = new_contents.clone();
 
-    println!("Edited {} with new contents:\n{}", filename, new_contents);
-    readline();
+            fs::write(format!("{}/{}.txt", get_document_path(), filename), contents)
+                .expect("Error while writing to file");
+
+            println!("Edited {} with new contents:\n{}", filename, new_contents);
+        },
+        Err(_) => {
+            println!("{} does not exist!", filename);
+        }
+        
+    }
 }
 
 fn exit() {
