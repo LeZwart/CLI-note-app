@@ -48,6 +48,12 @@ fn readline() -> String {
     return input.trim().to_string();
 }
 
+// TODO: Make it so that you can press any key to continue
+fn press_to_continue() {
+    println!("Press Enter to continue...");
+    readline();
+}
+
 fn create_document() {
     // Ask for filename
     println!("Enter the name of the new document:");
@@ -64,7 +70,7 @@ fn create_document() {
 
     // Print success message
     println!("Created {} with contents:\n{}", filename, contents);
-    readline();
+    press_to_continue();
 }
 
 fn open_document() {
@@ -99,7 +105,7 @@ fn list_documents() {
             println!("{}", path.file_stem().unwrap().to_str().unwrap());
         }
     }
-    readline();
+    press_to_continue();
 }
 
 // TODO: Make more user friendly
@@ -123,6 +129,7 @@ fn edit_document() {
                 .expect("Error while writing to file");
 
             println!("Edited {} with new contents:\n{}", filename, new_contents);
+            press_to_continue();
         },
         Err(_) => {
             println!("{} does not exist!", filename);
